@@ -8,21 +8,37 @@ export default class App extends Component {
 		this.state = {
 			drawer : null, 
 			chillerList : [ 
-				["ch1", -6, 6], ["ch2", -12, 6],
+				["ch1", 2, 8], ["ch2", -6, 8], ["ch3", -14, 8],
 			],
 			officeList: [
-				["office", 6, 6]
+				["office", 14, 2]
 			],
 			pumpList: [
-				["pump1", -6, 0], ["pump2", -12, 0]
+				["pump1", 2, -4], ["pump2", -6, -4], ["pump3", -14, -4]
 			], 
 			pathList: [
-				[
-					[6, 6], [6, -3], [-6, -3], [-6, 9], [6, 9], [6, 5], 
-				],
-				[
-					[6, 6], [6, -3], [-12, -3], [-12, 9], [6, 9], [6, 5], 
-				],
+				{
+					name: "chiller1",
+					points: {
+						pin: [[14, 2], [14, -8], [2, -8], [2, 8]], //in
+						pout: [[2, 8], [2, 12], [14, 12], [14, 2]], //out
+					}
+				},
+				{
+					name: "chiller2",
+					points: {
+						pin: [[14, 2], [14, -8], [-6, -8], [-6, 8]], //in
+						pout: [[-6, 8], [-6, 12], [14, 12], [14, 2]], //out
+					}
+				},
+				{
+					name: "chiller3",
+					points: {
+						pin: [[14, 2], [14, -8], [-14, -8], [-14, 8]], //in
+						pout: [[-14, 8], [-14, 12], [14, 12], [14, 2]], //out
+					}
+				},
+				
 			]
 		}
 	}
@@ -53,10 +69,10 @@ export default class App extends Component {
 		return (
 			<div style={{ padding: 0, height: "96vh" }}>
 				<canvas style={{ width: "100%", height: "100%" }} id="canvasId125"></canvas>
-				<div style={{ position: "absolute", left: 0, top: 0, border: "1px solid grey", backgroundColor: "#ffffff55", padding: "8px 16px" }}>
+				{/* <div style={{ position: "absolute", left: 0, top: 0, border: "1px solid grey", backgroundColor: "#ffffff55", padding: "8px 16px" }}>
 					<button style={{ margin: 8 }} onClick={this._clickChangedPipeColor}>Change Pipe Surface</button>
 					<button style={{ margin: 8 }} onClick={this._clickChangedEarthColor}>Change Earth Surface</button>
-				</div>
+				</div> */}
 			</div>
 		);
 	}
