@@ -6,6 +6,7 @@ export default class App extends Component {
 	constructor() {
 		super()
 		this.state = {
+			loading3DMap: true,
 			drawer : null, 
 			chillerList : [ 
 				["chiller1", 2, 8], ["chiller2", -6, 8], ["chiller3", -14, 8],
@@ -21,7 +22,8 @@ export default class App extends Component {
 					chiller: "chiller1",
 					points: {
 						pin: [ 
-							[14, 2.4, 2], [14, 2.4, -1], [14, 2.4, -1], [14, 2.4, -1], [2, 2.4, -1], [2, 2.4, -3], 
+							// [14, 2.4, 2], [14, 2.4, -1.1], [14, 2.4, -1], [14, 2.4, -1], [14, 2.4, -1], [2, 2.4, -1], [2, 2.4, -3], 
+							[14, 2.4, 2], [14, 2.4, -1], [2, 2.4, -1], [2, 2.4, -3], 
 							[2+0.3, 2.4, -3.4], [2+0.3, 5, -3.4], [2+0.3, 5, 5], [2+0.3, 2, 5], [2+0.3, 2, 8], 
 						], //in
 						pout: [ [0.9, 2, 8], [0.9, 2, 3], [14, 2, 3],  ] //out
@@ -31,7 +33,7 @@ export default class App extends Component {
 					name: "chiller2",
 					points: {
 						pin: [ 
-							[14, 2.4, 2], [14, 2.4, -1], [14, 2.4, -1], [14, 2.4, -1], [-6, 2.4, -1], [-6, 2.4, -3], 
+							[14, 2.4, 2], [14, 2.4, -1], [-6, 2.4, -1], [-6, 2.4, -3], 
 							[-5.7, 2.4, -3.4], [-5.7, 5, -3.4], [-5.7, 5, 5], [-5.7, 2, 5], [-5.7, 2, 8], 
 						], //in
 						pout: [ [-7.1, 2, 8], [-7.1, 2, 3], [14, 2, 3],  ] //out
@@ -41,10 +43,10 @@ export default class App extends Component {
 					name: "chiller3",
 					points: {
 						pin: [ 
-							[14, 2.4, 2], [14, 2.4, -1], [14, 2.4, -1], [14, 2.4, -1], [-14, 2.4, -1], [-14, 2.4, -3], 
-							[-13., 2.4, -3.4], [-13.7, 5, -3.4], [-13.7, 5, 5], [-13.7, 2, 5], [-13.7, 2, 8], 
+							[14, 2.4, 2], [14, 2.4, -1], [-14, 2.4, -1], [-14, 2.4, -3], 
+							[-13.7, 2.4, -3.4], [-13.7, 5, -3.4], [-13.7, 5, 5], [-13.7, 2, 5], [-13.7, 2, 8], 
 						], //in
-						pout: [ [-15.1, 2, 8], [-15.1, 2, 3], [14, 2, 3],  ] //out
+						pout: [ [-15.1, 2, 8], [-15.1, 2, 3], [14, 2, 3], ] //out
 					}
 				},
 				
@@ -61,10 +63,12 @@ export default class App extends Component {
 			pathList: this.state.pathList,
 		}
 		this.setState({ drawer: new Drawer(constructorProps) }, () => {
-			this.state.drawer.draw()
+			this.state.drawer.draw(this.map3DLoaded)
 		})
 		
 	}
+
+	map3DLoaded = () => this.setState({ loading3DMap: false })
 
 	_clickChangedPipeColor = () => {
 		this.state.drawer.changePipeMaterial()
@@ -82,6 +86,17 @@ export default class App extends Component {
 					<button style={{ margin: 8 }} onClick={this._clickChangedPipeColor}>Change Pipe Surface</button>
 					<button style={{ margin: 8 }} onClick={this._clickChangedEarthColor}>Change Earth Surface</button>
 				</div> */}
+				{
+					this.state.loading3DMap && (
+						<div style={{ position: "fixed", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: "#fdfdfdff", }} >
+							<div style={{ position: "absolute", left: "50%", bottom: "50%", }}>
+								<div style={{ position: "relative", left: "-50%", bottom: "-50%", }}>
+									<img width="40" src="img-material/loading.gif" alt="Loading 3D Map" />
+								</div>
+							</div>
+						</div>
+					)
+				}
 			</div>
 		);
 	}

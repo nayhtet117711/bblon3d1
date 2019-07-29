@@ -26,8 +26,8 @@ export default class Drawer {
 		this.meshChiller = null;
 	}
 
-	draw = () => {
-		this.initScene(this.createScene)
+	draw = (callback) => {
+		this.initScene(()=>this.createScene(callback))
 
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
@@ -47,6 +47,11 @@ export default class Drawer {
 		this.camera = new BABYLON.ArcRotateCamera("camera", -0.78, 0.9, 30, BABYLON.Vector3.Zero(), this.scene, true);
 		this.camera.setTarget(BABYLON.Vector3.Zero());
 		this.camera.attachControl(this.canvas, true);
+		this.camera.lowerAlphaLimit = -1.5
+		this.camera.upperAlphaLimit = 1.3
+		this.camera.lowerBetaLimit = 0.1
+		this.camera.upperBetaLimit = 1.3
+		this.camera.panningDistanceLimit = 40
 
 		//
 		//HemisphericLight
@@ -55,7 +60,7 @@ export default class Drawer {
 		this.light.autoUpdateExtends = true;
 
 		this.material0 = new BABYLON.StandardMaterial("material0", this.scene);
-		this.material0.diffuseTexture = new BABYLON.Texture("ground2.jpg", this.scene)
+		this.material0.diffuseTexture = new BABYLON.Texture("img-material/ground2.jpg", this.scene)
 
 		this.material1 = new BABYLON.StandardMaterial("material1", this.scene);
 		// this.material1.diffuseTexture = new BABYLON.Texture("earchsurfac.jpg", this.scene)
@@ -82,13 +87,13 @@ export default class Drawer {
 	}
 
 	loadMeshes = (callback) => {
-		BABYLON.SceneLoader.ImportMesh("", "./", "Chiller1.obj", this.scene, meshes => {
+		BABYLON.SceneLoader.ImportMesh("", "./mesh-obj/", "Chiller1.obj", this.scene, meshes => {
 			this.meshChiller = BABYLON.Mesh.MergeMeshes(meshes)
 			this.meshChiller.visibility = 0
-			BABYLON.SceneLoader.ImportMesh("", "./", "Pump1.obj", this.scene, meshes => {
+			BABYLON.SceneLoader.ImportMesh("", "./mesh-obj/", "Pump1.obj", this.scene, meshes => {
 				this.meshPump = BABYLON.Mesh.MergeMeshes(meshes)
 				this.meshPump.visibility = 0
-				BABYLON.SceneLoader.ImportMesh("", "./", "Building1.obj", this.scene, meshes => {
+				BABYLON.SceneLoader.ImportMesh("", "./mesh-obj/", "Building1.obj", this.scene, meshes => {
 					this.meshOffice = BABYLON.Mesh.MergeMeshes(meshes)
 					this.meshOffice.visibility = 0
 					callback()
@@ -97,7 +102,7 @@ export default class Drawer {
 		});
 	}
 
-	createScene = () => {
+	createScene = (callback) => {
 		this.chillerList.forEach(chiller => {
 			this.drawChiller({ name: chiller[0], posX: chiller[1], posZ: chiller[2] })
 		});
@@ -110,6 +115,7 @@ export default class Drawer {
 		this.pathList.forEach(path => {
 			this.drawPath(path)
 		});
+		callback()
 
 	}
 
@@ -128,9 +134,9 @@ export default class Drawer {
 
 			sphere.actionManager = new BABYLON.ActionManager(this.scene)
 			sphere.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-				BABYLON.ActionManager.OnPickDownTrigger,
+				BABYLON.ActionManager.OnPickUpTrigger,
 				e => {
-					alert("Click on earth.")
+					alert("Click on "+name)
 				}
 			));
 		}
@@ -165,8 +171,43 @@ export default class Drawer {
 	}
 
 	drawPath = (path) => {
-		const vector3PointInList = path.points.pin.map(p => new BABYLON.Vector3(p[0], p[1], p[2]))
-		const vector3PointOutList = path.points.pout.map(p => new BABYLON.Vector3(p[0], p[1], p[2]))
+		const pathPin = path.points.pin.reduce((r,c,i,arr) => {
+			if(i===0) return [...r, c]
+			else {
+				const p1 = arr[i-1]
+				const p2 = c
+				const ci = p1.reduce((r1, c1, i1) => c1!==p2[i1] ? i1 : r1  ,-1) // find the index of difference point
+				if(ci<0) return [...r, c]
+				else {
+					const div = p2[ci]-p1[ci] < 0 ? -0.1 : 0.1
+					const anp1 = [...p1]
+					anp1[ci] = p1[ci] + div
+					const anp2 = [...p2]
+					anp2[ci] = p2[ci] - div
+					return [...r, anp1, anp2, c] 
+				}
+			}
+		} , [])
+		const pathPout = path.points.pout.reduce((r,c,i,arr) => {
+			if(i===0) return [...r, c]
+			else {
+				const p1 = arr[i-1]
+				const p2 = c
+				const ci = p1.reduce((r1, c1, i1) => c1!==p2[i1] ? i1 : r1  ,-1) // find the index of difference point
+				if(ci<0) return [...r, c]
+				else {
+					const div = p2[ci]-p1[ci] < 0 ? -0.1 : 0.1
+					const anp1 = [...p1]
+					anp1[ci] = p1[ci] + div
+					const anp2 = [...p2]
+					anp2[ci] = p2[ci] - div
+					return [...r, anp1, anp2, c] 
+				}
+			}
+		} , [])
+		// console.log({ path: path.points.pin, pathh })
+		const vector3PointInList = pathPin.map(p => new BABYLON.Vector3(p[0], p[1], p[2]))
+		const vector3PointOutList = pathPout.map(p => new BABYLON.Vector3(p[0], p[1], p[2]))
 
 		const tubeIn = BABYLON.MeshBuilder.CreateTube(`pip-in-${path.name}`, { path: vector3PointInList, radius: 0.25, updatable: false, invertUV: true,}, this.scene);
 		tubeIn.material = this.material2
