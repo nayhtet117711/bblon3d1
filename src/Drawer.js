@@ -9,6 +9,7 @@ export default class Drawer {
 			officeList,
 			pumpList,
 			pathList,
+			chillerText
 		} = props
 		this.scene = null;
 		this.material0 = null;
@@ -19,6 +20,7 @@ export default class Drawer {
 		this.condenserList = null;
 		this.officeList = officeList;
 		this.pathList = pathList;
+		this.chillerText = chillerText
 		this.canvas = document.getElementById(canvasId)
 		this.engine = new BABYLON.Engine(this.canvas, true, { preserveDrawingBuffer: true, stencil: true })
 		this.meshOffice = null;
@@ -44,19 +46,19 @@ export default class Drawer {
 		this.scene = new BABYLON.Scene(this.engine);
 
 		// this.camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 4, 45, BABYLON.Vector3.Zero(), this.scene, true);
-		this.camera = new BABYLON.ArcRotateCamera("camera", -1.2, 1.2, 30, BABYLON.Vector3.Zero(), this.scene, true);
+		this.camera = new BABYLON.ArcRotateCamera("camera", -0.9, 1.2, 30, BABYLON.Vector3.Zero(), this.scene, true);
 		this.camera.setTarget(BABYLON.Vector3.Zero());
 		this.camera.attachControl(this.canvas, true);
-		this.camera.lowerAlphaLimit = -1.7
-		this.camera.upperAlphaLimit = 1.3
-		this.camera.lowerBetaLimit = 0.7
-		this.camera.upperBetaLimit = 1.3
-		this.camera.panningSensibility = 120
-		this.camera.upperRadiusLimit = 100
-		this.camera.lowerRadiusLimit = 10
+		// this.camera.lowerAlphaLimit = -1.7
+		// this.camera.upperAlphaLimit = 1.3
+		// this.camera.lowerBetaLimit = 0.7
+		// this.camera.upperBetaLimit = 1.3
+		// this.camera.panningSensibility = 120
+		// this.camera.upperRadiusLimit = 100
+		this.camera.lowerRadiusLimit = 8
 
 		//HemisphericLight
-		this.light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(-10, -30, -10), this.scene);
+		this.light = new BABYLON.DirectionalLight("light", new BABYLON.Vector3(-40, -100, 50), this.scene);
 		this.light.diffuseColor = new BABYLON.Color3(1, 1, 1);
 		this.light.autoUpdateExtends = true;
 
@@ -90,7 +92,7 @@ export default class Drawer {
 	}
 
 	loadMeshes = (callback) => {
-		BABYLON.SceneLoader.ImportMesh("", "./mesh-obj/", "Chiller1.obj", this.scene, meshes => {
+		BABYLON.SceneLoader.ImportMesh("", "./mesh-obj/", "Chiller2.obj", this.scene, meshes => {
 			this.meshChiller = BABYLON.Mesh.MergeMeshes(meshes)
 			this.meshChiller.visibility = 0
 			BABYLON.SceneLoader.ImportMesh("", "./mesh-obj/", "Pump1.obj", this.scene, meshes => {
@@ -133,6 +135,20 @@ export default class Drawer {
 			sphere.material = this.material1
 			sphere.rotation.y = Math.PI
 
+			const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplaneChiller", { width: 2.3, height: 0.6 }, this.scene);
+			outputplane.material = new BABYLON.StandardMaterial("planematerial", this.scene);
+			outputplane.position = new BABYLON.Vector3(posX+0.58, 3.58, posZ+1.4);
+			outputplane.rotation.y = -Math.PI/2
+
+			const outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", { width: 465, height: 120 }, this.scene, false);
+			outputplane.material.diffuseTexture = outputplaneTexture;
+			outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
+			outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+			outputplane.material.backFaceCulling = true;
+
+			outputplaneTexture.drawText(name, null, null, "bold 70px Arial", "#232323", "#a5a8bb", true);
+
+
 			sphere.actionManager = new BABYLON.ActionManager(this.scene)
 			sphere.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 				BABYLON.ActionManager.OnPickUpTrigger,
@@ -140,14 +156,21 @@ export default class Drawer {
 					//alert("Click on " + name)
 				}
 			));
-
-			this.drawTextPlane({ name:"Efficiency: 128.3",  posX, posY: 1, posZ })
-			this.drawTextPlane({ name:"Power: 128 kW", posX, posY: 2, posZ })
-			this.drawTextPlane({ name:"Power Consumption: 128 kW", posX, posY: 3, posZ })
-			this.drawTextPlane({ name:"Input Temperature: 18 \u{2103}",  posX, posY: 4, posZ })
-			this.drawTextPlane({ name:"Output Temperature: 18 \u{2103}",  posX, posY: 5, posZ })
-
+			
 		}
+	}
+
+	drawChillerText = ({ chillerText }) => {
+		this.scene.meshes.forEach(v=> v.id==="outputplane" ? this.scene.removeMesh(v) : null)
+		this.chillerList.forEach(chiller => {
+			const name = chiller[0]
+			const posX = chiller[1]
+			const posZ = chiller[2]
+			
+			chillerText[name]!==undefined && chillerText[name].forEach((text, index)=> {
+				this.drawTextPlane({ name: text,  posX, posY: index+1, posZ })
+			})
+		});
 	}
 
 	drawOffice = ({ name, posX, posZ }) => {
