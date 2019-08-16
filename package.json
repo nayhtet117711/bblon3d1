@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@csstools/normalize.css": "^10.1.0",
     "babylonjs": "^4.0.3",
     "babylonjs-loaders": "^4.0.3",
     "react": "^16.8.6",

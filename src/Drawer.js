@@ -1,5 +1,7 @@
 import * as BABYLON from "babylonjs"
-import { STLFileLoader } from 'babylonjs-loaders';
+import {
+	STLFileLoader
+} from 'babylonjs-loaders';
 
 export default class Drawer {
 	constructor(props) {
@@ -22,7 +24,10 @@ export default class Drawer {
 		this.pathList = pathList;
 		this.chillerText = chillerText
 		this.canvas = document.getElementById(canvasId)
-		this.engine = new BABYLON.Engine(this.canvas, true, { preserveDrawingBuffer: true, stencil: true })
+		this.engine = new BABYLON.Engine(this.canvas, true, {
+			preserveDrawingBuffer: true,
+			stencil: true
+		})
 		this.meshOffice = null;
 		this.meshPump = null;
 		this.meshChiller = null;
@@ -83,7 +88,12 @@ export default class Drawer {
 		this.material22.alpha = 1
 		this.material22.backFaceCulling = false
 
-		this.ground = BABYLON.MeshBuilder.CreateGround("ground1", { width: 80, height: 40, subdivisions: 1, updatable: true }, this.scene);
+		this.ground = BABYLON.MeshBuilder.CreateGround("ground1", {
+			width: 80,
+			height: 40,
+			subdivisions: 1,
+			updatable: true
+		}, this.scene);
 		this.ground.receiveShadows = true;
 		this.ground.material = this.material0;
 
@@ -109,13 +119,25 @@ export default class Drawer {
 
 	createScene = (callback) => {
 		this.chillerList.forEach(chiller => {
-			this.drawChiller({ name: chiller[0], posX: chiller[1], posZ: chiller[2] })
+			this.drawChiller({
+				name: chiller[0],
+				posX: chiller[1],
+				posZ: chiller[2]
+			})
 		});
 		this.officeList.forEach(office => {
-			this.drawOffice({ name: office[0], posX: office[1], posZ: office[2] })
+			this.drawOffice({
+				name: office[0],
+				posX: office[1],
+				posZ: office[2]
+			})
 		});
 		this.pumpList.forEach(pump => {
-			this.drawPump({ name: pump[0], posX: pump[1], posZ: pump[2] })
+			this.drawPump({
+				name: pump[0],
+				posX: pump[1],
+				posZ: pump[2]
+			})
 		});
 		this.pathList.forEach(path => {
 			this.drawPath(path)
@@ -124,7 +146,11 @@ export default class Drawer {
 
 	}
 
-	drawChiller = ({ name, posX, posZ }) => {
+	drawChiller = ({
+		name,
+		posX,
+		posZ
+	}) => {
 		if (this.meshOffice) {
 			const sphere = this.meshChiller.clone();
 			sphere.id = `chiller-${name}`
@@ -135,12 +161,18 @@ export default class Drawer {
 			sphere.material = this.material1
 			sphere.rotation.y = Math.PI
 
-			const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplaneChiller", { width: 2.3, height: 0.6 }, this.scene);
+			const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplaneChiller", {
+				width: 2.3,
+				height: 0.6
+			}, this.scene);
 			outputplane.material = new BABYLON.StandardMaterial("planematerial", this.scene);
-			outputplane.position = new BABYLON.Vector3(posX+0.58, 3.58, posZ+1.4);
-			outputplane.rotation.y = -Math.PI/2
+			outputplane.position = new BABYLON.Vector3(posX + 0.58, 3.58, posZ + 1.4);
+			outputplane.rotation.y = -Math.PI / 2
 
-			const outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", { width: 465, height: 120 }, this.scene, false);
+			const outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", {
+				width: 465,
+				height: 120
+			}, this.scene, false);
 			outputplane.material.diffuseTexture = outputplaneTexture;
 			outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
 			outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
@@ -156,24 +188,43 @@ export default class Drawer {
 					//alert("Click on " + name)
 				}
 			));
-			
+
 		}
 	}
 
-	drawChillerText = ({ chillerText }) => {
-		this.scene.meshes.forEach(v=> v.id==="outputplane" ? this.scene.removeMesh(v) : null)
-		this.chillerList.forEach(chiller => {
+
+
+	drawChillerText = ({
+		chillerText
+	}) => {
+
+		this.scene.meshes.forEach(v => v.id === "outputplane" ? this.scene.removeMesh(v) : null)
+		const color = ["#fff9c4", "#b2ebf2", "#ffcdd2", "#c5cae9", "#d7ccc8"];
+		this.chillerList.forEach((chiller, i) => {
 			const name = chiller[0]
 			const posX = chiller[1]
+			const posY = chiller[3]
 			const posZ = chiller[2]
-			
-			chillerText[name]!==undefined && chillerText[name].forEach((text, index)=> {
-				this.drawTextPlane({ name: text,  posX, posY: index+1, posZ })
+			const c = color[i % 5]
+			chillerText[name] !== undefined && chillerText[name].forEach((text, index) => {
+				this.drawTextPlane({
+					name: text,
+					posX,
+					posY,
+					posZ,
+					index,
+					c
+				})
 			})
-		});
+		})
 	}
 
-	drawOffice = ({ name, posX, posZ }) => {
+
+	drawOffice = ({
+		name,
+		posX,
+		posZ
+	}) => {
 		if (this.meshOffice) {
 			const sphere = this.meshOffice.clone()
 			sphere.visibility = 1
@@ -186,7 +237,11 @@ export default class Drawer {
 		}
 	}
 
-	drawPump = ({ name, posX, posZ }) => {
+	drawPump = ({
+		name,
+		posX,
+		posZ
+	}) => {
 		//const sphere = BABYLON.MeshBuilder.CreateSphere(name, { diameter: 1.8 }, this.scene)
 		if (this.meshPump) {
 			const sphere = this.meshPump.clone();
@@ -200,19 +255,105 @@ export default class Drawer {
 		}
 	}
 
-	drawTextPlane = ({ name, posX, posY, posZ }) => {
-		const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 6, height: 1 }, this.scene);
+	drawTextPlane = ({
+		name,
+		posX,
+		posY,
+		posZ,
+		index,
+		c
+	}) => {
+		console.log({
+			posX,
+			posZ
+		})
+		//Set font
+		var font_size = 48;
+		var font = "bold " + font_size + "px Arial";
+
+		//Set height for plane
+		var planeHeight = 0.5;
+
+		//Set height for dynamic texture
+		var DTHeight = 1.5 * font_size; //or set as wished
+
+		//Calcultae ratio
+		var ratio = planeHeight / DTHeight;
+
+
+		//Use a temporay dynamic texture to calculate the length of the text on the dynamic texture canvas
+		var temp = new BABYLON.DynamicTexture("DynamicTexture", {
+			width: 1200,
+			height: 200
+		}, this.scene);
+		var tmpctx = temp.getContext();
+		tmpctx.font = font;
+		var DTWidth = tmpctx.measureText(name).width + 40;
+
+		//Calculate width the plane has to be 
+		var planeWidth = DTWidth * ratio;
+
+		const outputplaneTexture = new BABYLON.DynamicTexture("DynamicTexture", {
+			width: DTWidth,
+			height: DTHeight
+		}, this.scene, false);
+
+		outputplaneTexture.drawText(name, null, null, font, "#000000", c, true);
+
+		const ctx = outputplaneTexture.getContext()
+		outputplaneTexture.update()
+
+		const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", {
+			width: planeWidth,
+			height: planeHeight
+		}, this.scene);
+
 		outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
 		outputplane.material = new BABYLON.StandardMaterial("planematerial", this.scene);
-		outputplane.position = new BABYLON.Vector3(posX, 3.6+posY, posZ+2);
+		// outputplane.position = (index % 3) === 0 ? new BABYLON.Vector3(posX + 2.2, posY + 1, posZ) : new BABYLON.Vector3(posX - 2.2, posY + 1, posZ - 2);
 
-		const outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", { width: 1200, height: 200 }, this.scene, false);
+		if (index === 0) {
+			outputplane.position.x = posX ;
+			outputplane.position.y = posY + 2.3;
+			outputplane.position.z = posZ - 1.5;
+
+		} else if (index === 1) {
+			outputplane.position.x = posX + 1;
+			outputplane.position.y = posY + 3;
+			outputplane.position.z = posZ - 1.5;
+		} else if (index === 2) {
+			outputplane.position.x = posX - 1.5;
+			outputplane.position.y = posY + 3;
+			outputplane.position.z = posZ + 2.6;
+		} else if (index === 3) {
+			outputplane.position.x = posX - 2.5;
+			outputplane.position.y = posY + 2.3;
+			outputplane.position.z = posZ + 2.6;
+		}
+		// else {
+		// 	outputplane.position.x = posX + 2.2;
+		// 	outputplane.position.y = posY;
+		// 	outputplane.position.z = posZ;
+		// }
+
 		outputplane.material.diffuseTexture = outputplaneTexture;
 		outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
 		outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
 		outputplane.material.backFaceCulling = true;
 
-		outputplaneTexture.drawText(name, 30, null, "bold 70px Arial", "#e5eee5", "#226733", true);
+		// console.log({name : Math.ceil(name.length/4)})
+		// const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 6, height: 1 }, this.scene);
+		// outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+		// outputplane.material = new BABYLON.StandardMaterial("planematerial", this.scene);
+		// outputplane.position = new BABYLON.Vector3(posX, 3.6+posY, posZ+2);
+
+		// const outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", { width:1200, height: 200 }, this.scene, false);
+		// outputplane.material.diffuseTexture = outputplaneTexture;
+		// outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
+		// outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+		// outputplane.material.backFaceCulling = true;
+
+		// outputplaneTexture.drawText(name, 30, null, "bold 70px Arial", "#e5eee5", "#226733", true);
 		// const ctx = outputplaneTexture.getContext()
 		// outputplaneTexture.update()
 	}
@@ -256,16 +397,28 @@ export default class Drawer {
 		const vector3PointInList = pathPin.map(p => new BABYLON.Vector3(p[0], p[1], p[2]))
 		const vector3PointOutList = pathPout.map(p => new BABYLON.Vector3(p[0], p[1], p[2]))
 
-		const tubeIn = BABYLON.MeshBuilder.CreateTube(`pip-in-${path.name}`, { path: vector3PointInList, radius: 0.25, updatable: false, invertUV: true, }, this.scene);
+		const tubeIn = BABYLON.MeshBuilder.CreateTube(`pip-in-${path.name}`, {
+			path: vector3PointInList,
+			radius: 0.25,
+			updatable: false,
+			invertUV: true,
+		}, this.scene);
 		tubeIn.material = this.material2
 
-		const tubeOut = BABYLON.MeshBuilder.CreateTube(`pip-out-${path.name}`, { path: vector3PointOutList, radius: 0.25, updatable: true, invertUV: true }, this.scene);
+		const tubeOut = BABYLON.MeshBuilder.CreateTube(`pip-out-${path.name}`, {
+			path: vector3PointOutList,
+			radius: 0.25,
+			updatable: true,
+			invertUV: true
+		}, this.scene);
 		tubeOut.material = this.material22
 	}
 
 	changeEarthMaterial = () => {
 		const ids = this.scene.meshes.map(v => v.id)
-		console.log({ ids })
+		console.log({
+			ids
+		})
 		// if (this.material1.diffuseTexture.name === "earchsurfac.jpg")
 		// 	this.material1.diffuseTexture = new BABYLON.Texture("wartersurfac.jpg", this.scene)
 		// else

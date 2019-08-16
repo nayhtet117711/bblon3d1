@@ -27,8 +27,9 @@ export default class App extends Component {
 					this.state.drawer.draw(this.map3DLoaded)
 					const chillerText = {
 						chiller1: ["Efficiency: 128.3", "Power: 128 kW", "Power Consumption: 128 kW", "Input Temperature: 18 ℃"],
-						chiller2: ["Efficiency: 78.02", "Power: 150 kW", "Power Consumption: 90 kW"],
-						chiller3: ["Efficiency: 55.02", "Power: 98 kW", "Power Consumption: 132 kW"]
+						chiller2: ["Efficiency: 78.02", "Power: 150 kW", "Power Consumption: 90 kW", "Input Temperature: 18 ℃"],
+						chiller3: ["Efficiency: 55.02", "Power: 98 kW", "Power Consumption: 132 kW"],
+						
 					}
 					this.state.drawer.drawChillerText({ chillerText })
 				})
